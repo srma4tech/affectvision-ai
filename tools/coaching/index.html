@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Coaching and Preparation | AffectVision AI</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="../../face-api.min.js"></script>
+    <script type="module" defer src="./script.js"></script>
+</head>
+<body>
+    <main class="app" id="app-root">
+        <header class="topbar">
+            <a class="back" href="../../index.html">Back to tools</a>
+            <div class="heading">
+                <h1>Interview Coaching and Preparation</h1>
+                <p>Chrome-only guided practice with topic survey, one-by-one questions, and detailed feedback.</p>
+            </div>
+        </header>
+
+        <section class="layout">
+            <section class="panel stage">
+                <p id="status" class="status" role="status" aria-live="polite">Loading models...</p>
+                <div class="video-wrapper" id="video-wrapper">
+                    <video id="video" width="960" height="720" autoplay muted playsinline></video>
+                </div>
+            </section>
+
+            <section class="panel side-panel">
+                <section class="setup" id="setup-panel">
+                    <h2>Practice Survey</h2>
+                    <p class="setup-note">Select your practice setup to generate questions tailored to your topic.</p>
+                    <form id="setup-form">
+                        <label for="interview-type">Interview Type</label>
+                        <select id="interview-type" required>
+                            <option value="behavioral">Behavioral</option>
+                            <option value="technical">Technical</option>
+                            <option value="hr">HR</option>
+                        </select>
+
+                        <label for="topic">Topic / Skill</label>
+                        <select id="topic" required>
+                            <option value="javascript">JavaScript</option>
+                            <option value="react">React</option>
+                            <option value="python">Python</option>
+                            <option value="product">Product Management</option>
+                            <option value="communication">Communication</option>
+                            <option value="custom">Custom Topic</option>
+                        </select>
+
+                        <label for="custom-topic" class="hidden" id="custom-topic-label">Custom Topic</label>
+                        <input id="custom-topic" class="hidden" type="text" placeholder="Example: System Design" />
+
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty" required>
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+
+                        <label for="question-count">Question Count</label>
+                        <select id="question-count" required>
+                            <option value="3">3</option>
+                            <option value="5" selected>5</option>
+                            <option value="7">7</option>
+                        </select>
+
+                        <p class="browser-note" id="browser-note">
+                            Best experience and AI evaluation are available in Google Chrome.
+                        </p>
+
+                        <button id="start-practice" type="submit">Start Practice Session</button>
+                    </form>
+                </section>
+
+                <section class="coaching" id="coaching-panel">
+                    <div class="coaching-header">
+                        <h2>Practice Console</h2>
+                        <span id="practice-state" class="badge">Starting</span>
+                    </div>
+
+                    <div class="question-box">
+                        <h3>Current Practice Question</h3>
+                        <p class="progress" id="question-progress">Question 1 of 5</p>
+                        <p id="question"></p>
+                        <p class="question-feedback" id="question-feedback" role="status" aria-live="polite"></p>
+                        <div class="mode-switch" role="radiogroup" aria-label="Response mode">
+                            <label>
+                                <input type="radio" name="response-mode" value="text" checked>
+                                Text
+                            </label>
+                            <label>
+                                <input type="radio" name="response-mode" value="audio">
+                                Audio
+                            </label>
+                        </div>
+                        <label for="answer-input">Your Response</label>
+                        <textarea id="answer-input" rows="4" placeholder="Type your answer here for quality evaluation..."></textarea>
+                        <div class="audio-controls hidden" id="audio-controls">
+                            <button id="start-recording" type="button">Start Recording</button>
+                            <button id="stop-recording" type="button" class="secondary" disabled>Stop Recording</button>
+                            <button id="clear-transcript" type="button" class="secondary">Clear Transcript</button>
+                        </div>
+                        <p class="audio-status hidden" id="audio-status">Microphone idle.</p>
+                        <p class="answer-note">Tip: keep responses structured (Situation, Task, Action, Result).</p>
+                    </div>
+
+                    <div class="live-grid">
+                        <article>
+                            <h3>Dominant Expression</h3>
+                            <p id="expression">-</p>
+                        </article>
+                        <article>
+                            <h3>Confidence</h3>
+                            <p id="confidence">-</p>
+                        </article>
+                        <article>
+                            <h3>Face Presence</h3>
+                            <p id="face-presence">-</p>
+                        </article>
+                        <article>
+                            <h3>Delivery Hint</h3>
+                            <p id="live-hint">Center your face and begin your answer.</p>
+                        </article>
+                    </div>
+
+                    <div class="actions">
+                        <button id="next-question" type="button">Evaluate and Next</button>
+                        <button id="end-session" type="button" class="secondary">End Practice Session</button>
+                    </div>
+                </section>
+
+                <section class="report hidden" id="report-panel" aria-live="polite">
+                    <h2>Coaching Report</h2>
+                    <div class="report-grid">
+                        <article class="report-wide">
+                            <h3>Question-by-Question Response Review</h3>
+                            <div id="response-breakdown-list"></div>
+                        </article>
+                        <article>
+                            <h3>Session Summary</h3>
+                            <ul id="summary-list"></ul>
+                        </article>
+                        <article>
+                            <h3>Expression Trend</h3>
+                            <ul id="expression-list"></ul>
+                        </article>
+                        <article>
+                            <h3>Coaching Insights</h3>
+                            <ul id="insight-list"></ul>
+                        </article>
+                        <article>
+                            <h3>Response Quality</h3>
+                            <ul id="quality-list"></ul>
+                        </article>
+                        <article>
+                            <h3>Session Integrity</h3>
+                            <ul id="integrity-list"></ul>
+                        </article>
+                        <article>
+                            <h3>Preparation Plan</h3>
+                            <p id="next-step"></p>
+                        </article>
+                    </div>
+                    <div class="actions">
+                        <button id="restart-session" type="button">Start New Practice</button>
+                    </div>
+                </section>
+            </section>
+        </section>
+
+        <div class="integrity-modal hidden" id="integrity-modal" role="dialog" aria-modal="true" aria-labelledby="integrity-modal-title">
+            <div class="integrity-modal-card">
+                <h2 id="integrity-modal-title">Integrity Warning</h2>
+                <p id="integrity-modal-message"></p>
+                <button id="integrity-modal-close" type="button">Understood</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+

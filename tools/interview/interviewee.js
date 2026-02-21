@@ -97,14 +97,14 @@ engine
   .init()
   .then(() => {
     initMotionAnalyzer();
-    status.textContent = "Interview in progress.";
+    status.textContent = "Candidate session in progress.";
     runtimeStatus.textContent = "Live";
     channel.publish({ type: "interviewee:status", statusText: "Live" });
   })
   .catch((error) => {
     console.error(error);
     runtimeStatus.textContent = "Error";
-    status.textContent = "Could not initialize interviewee screen.";
+    status.textContent = "Could not initialize candidate session screen.";
     channel.publish({ type: "interviewee:status", statusText: "Error" });
   });
 
@@ -118,7 +118,7 @@ document.addEventListener("visibilitychange", () => {
     channel.publish({
       type: "proctor:event",
       eventType: "tab_hidden",
-      detail: "Interviewee screen was hidden or tab switched.",
+      detail: "Candidate session screen was hidden or tab switched.",
     });
   }
 });

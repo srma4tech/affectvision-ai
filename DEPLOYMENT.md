@@ -18,11 +18,12 @@ Workflow file:
 ## Post-Deploy Validation Checklist
 
 1. Home page loads successfully.
-2. `Interview Console` opens from home.
-3. `Open Interviewee Screen` opens in a second tab/window.
-4. Camera permission works in interviewee screen.
-5. Question updates sync from interviewer to interviewee.
-6. Ending interview generates report in interviewer console.
+2. `Coaching and Preparation` opens and starts a single-screen practice flow.
+3. `Interview Monitoring` opens from home.
+4. `Open Candidate Session Screen` opens in a second tab/window.
+5. Camera permission works in candidate screen.
+6. Question updates sync from monitoring console to candidate screen.
+7. Ending interview generates a monitoring report.
 
 ## Troubleshooting
 
@@ -32,15 +33,15 @@ Workflow file:
 - Close other apps/tabs that may be locking the camera.
 - Test in latest Chrome or Edge.
 
-## 2) Interviewee screen does not receive question updates
-- Keep interviewer and interviewee tabs on the same domain/origin.
+## 2) Candidate screen does not receive question updates
+- Keep monitoring and candidate tabs on the same domain/origin.
 - Do not mix localhost and GitHub Pages URL in the same session.
-- Disable strict privacy extensions for the test domain if they block storage/broadcast APIs.
+- Disable strict privacy extensions for the test domain if they block storage or broadcast APIs.
 
-## 3) Report says “No samples captured”
-- Confirm interviewee tab has camera permission.
-- Ensure interviewee keeps face in frame.
-- Check if interviewee tab was closed/disconnected early.
+## 3) Report says "No samples captured"
+- Confirm candidate tab has camera permission.
+- Ensure candidate keeps face in frame.
+- Check if candidate tab was closed/disconnected early.
 
 ## 4) Static assets fail to load (404)
 - Ensure all paths remain relative in static files.
@@ -56,6 +57,7 @@ Workflow file:
 
 ## Operational Notes
 
-- Current cross-screen sync is browser-tab based (`BroadcastChannel` with `localStorage` fallback).
-- This is suitable for demo/single-origin sessions, not multi-device production interviews.
-- For production organization use, move sync/events to backend WebSocket channels with session IDs.
+- Current monitoring sync is browser-tab based (`BroadcastChannel` with `localStorage` fallback).
+- This is suitable for demo or single-origin sessions, not multi-device production interviews.
+- For organization production use, move sync/events to backend WebSocket channels with session IDs.
+

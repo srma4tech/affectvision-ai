@@ -76,9 +76,10 @@ export class InterviewSessionEngine {
       return;
     }
 
+    const clientRect = this.video.getBoundingClientRect();
     const displaySize = {
-      width: this.video.videoWidth || this.video.clientWidth || 960,
-      height: this.video.videoHeight || this.video.clientHeight || 720,
+      width: Math.round(clientRect.width) || this.video.clientWidth || this.video.videoWidth || 960,
+      height: Math.round(clientRect.height) || this.video.clientHeight || this.video.videoHeight || 720,
     };
 
     window.faceapi.matchDimensions(this.canvas, displaySize);
@@ -213,5 +214,9 @@ export class InterviewSessionEngine {
     this.stopDetectionLoop();
     this.stopCamera();
     window.removeEventListener("resize", this.boundSyncSize);
+    if (this.canvas) {
+      this.canvas.remove();
+      this.canvas = null;
+    }
   }
 }

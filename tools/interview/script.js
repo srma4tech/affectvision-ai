@@ -100,7 +100,7 @@ sendManualQuestionBtn.addEventListener("click", () => {
   questionEl.textContent = question;
   publishQuestion(question, "manual");
   manualQuestionInput.value = "";
-  status.textContent = "Manual question sent to interviewee screen.";
+  status.textContent = "Manual question sent to candidate screen.";
 });
 
 for (const input of modeInputs) {
@@ -181,7 +181,7 @@ function buildReport() {
     ]);
     setListItems(expressionList, ["No expression data available."]);
     setListItems(insightList, ["Unable to compute insights for this run."]);
-    setListItems(riskList, ["No risk signals captured because no interviewee samples were received."]);
+    setListItems(riskList, ["No risk signals captured because no candidate samples were received."]);
     riskLevelEl.textContent = "Unknown";
     nextStepEl.textContent = "Run a new interview and keep your face in frame for better analysis.";
     return;
@@ -316,8 +316,9 @@ restartSessionBtn.addEventListener("click", () => {
 publishQuestion(QUESTIONS[questionIndex], "automated");
 nextQuestionBtn.disabled = false;
 sendManualQuestionBtn.disabled = true;
-runtimeStatus.textContent = "Waiting for interviewee";
+runtimeStatus.textContent = "Waiting for candidate";
 riskLevelEl.textContent = "Low";
+status.textContent = "Monitoring console ready. Open candidate session screen to start analytics.";
 
 window.addEventListener("beforeunload", () => {
   channel.close();

@@ -3,7 +3,7 @@
 ## 1. Product Overview
 
 ### 1.1 Product Name (Working)
-MoodLens Interview Coach
+AffectVision AI Interview Coach
 
 ### 1.2 Problem
 Candidates often fail interviews due to poor delivery, nervousness, and weak communication structure, even when technical knowledge is sufficient. Existing tools over-index on generic AI chat feedback and lack behavioral signal tracking over time.
@@ -30,7 +30,7 @@ The system provides real-time and post-session coaching, with measurable improve
 Become the default “practice layer” before high-stakes interviews by giving objective, explainable, and repeatable coaching feedback.
 
 ### 2.2 Positioning Statement
-For candidates who need interview readiness, MoodLens Interview Coach is an AI practice platform that gives timeline-based behavioral and communication coaching, unlike generic chatbots that provide only text suggestions.
+For candidates who need interview readiness, AffectVision AI Interview Coach is an AI practice platform that gives timeline-based behavioral and communication coaching, unlike generic chatbots that provide only text suggestions.
 
 ### 2.3 Core Differentiators
 - Timeline analytics: detects confidence dips and recovery points by timestamp
@@ -446,3 +446,4 @@ This document file is located at:
 - docs/interview-coaching-product-doc.md
 
 You can share this file directly with product, design, and engineering teams as the baseline PRD + technical spec starter.
+

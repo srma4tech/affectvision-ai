@@ -1,7 +1,7 @@
 # Organization-Ready PRD v2
 
 ## 1. Document Purpose
-Define the product, platform, governance, and rollout requirements to make MoodLens Interview Monitoring deployable for organizations (not just individual interviewer use).
+Define the product, platform, governance, and rollout requirements to make AffectVision AI Interview Monitoring deployable for organizations (not just individual interviewer use).
 
 ## 2. Product Goal
 Enable organizations to monitor and improve interview process quality with structured workflows, interviewee-only analytics, and enterprise governance.
@@ -259,3 +259,4 @@ Organizations struggle with:
 - Version: v2.0
 - Date: 2026-02-21
 - Status: Draft for implementation planning
+

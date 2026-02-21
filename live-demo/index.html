@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AffectVision AI | Live Demo</title>
+  <meta name="description" content="Run the AffectVision AI Live Demo to test AI Face Detection System behavior, Real-Time Mood Detection, and confidence visualization in your browser.">
+  <meta name="keywords" content="AI Face Detection System, Emotion Recognition Software, Real-Time Mood Detection, Facial Expression Analysis">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://srma4tech.github.io/affectvision-ai/live-demo/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AffectVision AI | Live Demo">
+  <meta property="og:description" content="Live browser demo of AI Face Detection System and Real-Time Mood Detection with confidence charting.">
+  <meta property="og:url" content="https://srma4tech.github.io/affectvision-ai/live-demo/">
+  <meta property="og:image" content="https://srma4tech.github.io/affectvision-ai/assets/og-preview.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AffectVision AI | Live Demo">
+  <meta name="twitter:description" content="Try webcam-based facial expression analysis and confidence trend visualization.">
+  <meta name="twitter:image" content="https://srma4tech.github.io/affectvision-ai/assets/og-preview.webp">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="../assets/css/site.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script defer src="../assets/js/site.min.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" aria-label="Main header">
+    <a class="brand" href="../">AffectVision AI<small>AI-Powered Face & Emotion Intelligence Platform</small></a>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <a href="../">Home</a><a href="../live-demo/">Live Demo</a><a href="../features/">Features</a><a href="../use-cases/">Use Cases</a><a href="../technology/">Technology</a><a href="../api/">API</a><a href="../documentation/">Docs</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">Dark</button>
+  </header>
+  <main id="main">
+    <section class="page-hero reveal">
+      <p class="eyebrow">Real-Time Mood Detection</p>
+      <h1>Live Demo: AI Face Detection System in Action</h1>
+      <p class="subtitle">Grant camera permission to run the Emotion Recognition Software preview and confidence score simulation.</p>
+    </section>
+
+    <section class="section">
+      <h2 class="reveal">Webcam + Confidence Visualization</h2>
+      <div class="grid cols-2">
+        <article class="card reveal demo-wrap">
+          <h3>Webcam Stream</h3>
+          <div class="skeleton" id="webcam-skeleton" aria-hidden="true"></div>
+          <div class="hidden" id="webcam-shell"><video id="webcam-preview" class="media" autoplay playsinline muted aria-label="Live webcam preview"></video></div>
+          <p id="webcam-status" class="lead">Click Start Demo to initialize camera.</p>
+          <div class="cta"><button id="start-webcam" class="btn btn-primary" type="button">Start Demo</button><button id="stop-webcam" class="btn btn-secondary" type="button">Stop</button></div>
+        </article>
+        <article class="card reveal">
+          <h3>Confidence Trend</h3>
+          <div class="skeleton" id="chart-skeleton" aria-hidden="true"></div>
+          <div class="hidden chart-wrap" id="chart-shell"><canvas id="confidence-chart" aria-label="Confidence score chart"></canvas></div>
+          <p class="lead">Updates while demo is active.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer" aria-label="Footer">
+    <section><h2>AffectVision AI</h2><p>AI-Powered Face & Emotion Intelligence Platform.</p><p>Copyright © 2026 AffectVision AI.</p></section>
+    <section><h3>Social</h3><p><a href="https://github.com/srma4tech/affectvision-ai" target="_blank" rel="noopener">GitHub</a></p></section>
+    <section><h3>Legal</h3><div class="legal"><a href="../privacy-policy/">Privacy Policy</a><a href="../terms-of-service/">Terms</a></div></section>
+  </footer>
+</body>
+</html>
+
