@@ -7,6 +7,54 @@ const questionEl = document.getElementById("question");
 const video = document.getElementById("video");
 const videoWrapper = document.getElementById("video-wrapper");
 
+const motionState = {
+  canvas: null,
+  context: null,
+  previousFrame: null,
+  score: 0,
+};
+
+function initMotionAnalyzer() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 48;
+  motionState.canvas = canvas;
+  motionState.context = canvas.getContext("2d", { willReadFrequently: true });
+}
+
+function sampleBackgroundMotion() {
+  if (!motionState.context || video.readyState < 2) {
+    return motionState.score;
+  }
+
+  motionState.context.drawImage(video, 0, 0, motionState.canvas.width, motionState.canvas.height);
+  const current = motionState.context.getImageData(
+    0,
+    0,
+    motionState.canvas.width,
+    motionState.canvas.height,
+  ).data;
+
+  if (!motionState.previousFrame) {
+    motionState.previousFrame = new Uint8ClampedArray(current);
+    motionState.score = 0;
+    return motionState.score;
+  }
+
+  let delta = 0;
+  for (let i = 0; i < current.length; i += 4) {
+    const prevGray =
+      (motionState.previousFrame[i] + motionState.previousFrame[i + 1] + motionState.previousFrame[i + 2]) / 3;
+    const currGray = (current[i] + current[i + 1] + current[i + 2]) / 3;
+    delta += Math.abs(currGray - prevGray);
+  }
+
+  const pixelCount = motionState.canvas.width * motionState.canvas.height;
+  motionState.score = Math.min(1, delta / (pixelCount * 255));
+  motionState.previousFrame = new Uint8ClampedArray(current);
+  return motionState.score;
+}
+
 const engine = new InterviewSessionEngine({
   videoElement: video,
   wrapperElement: videoWrapper,
@@ -16,9 +64,13 @@ const engine = new InterviewSessionEngine({
     renderOverlay: false,
   },
   onMetrics: (metrics) => {
+    const backgroundMotionScore = sampleBackgroundMotion();
     channel.publish({
       type: "metrics:update",
-      metrics,
+      metrics: {
+        ...metrics,
+        backgroundMotionScore,
+      },
     });
   },
 });
@@ -44,6 +96,7 @@ const channel = new InterviewSyncChannel((message) => {
 engine
   .init()
   .then(() => {
+    initMotionAnalyzer();
     status.textContent = "Interview in progress.";
     runtimeStatus.textContent = "Live";
     channel.publish({ type: "interviewee:status", statusText: "Live" });
@@ -58,4 +111,14 @@ engine
 window.addEventListener("beforeunload", () => {
   channel.publish({ type: "interviewee:status", statusText: "Disconnected" });
   channel.close();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    channel.publish({
+      type: "proctor:event",
+      eventType: "tab_hidden",
+      detail: "Interviewee screen was hidden or tab switched.",
+    });
+  }
 });

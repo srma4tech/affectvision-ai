@@ -155,12 +155,15 @@ export class InterviewSessionEngine {
     if (!detections || detections.length === 0) {
       return {
         hasFace: false,
+        faceCount: 0,
         dominantExpression: "No face detected",
         confidence: 0,
+        attentionAway: false,
       };
     }
 
-    const expressions = detections[0].expressions || {};
+    const primary = detections[0];
+    const expressions = primary.expressions || {};
     let dominantExpression = "neutral";
     let confidence = 0;
 
@@ -171,10 +174,27 @@ export class InterviewSessionEngine {
       }
     }
 
+    const faceCount = detections.length;
+    const box = primary.detection?.box;
+    const landmarks = primary.landmarks;
+    let attentionAway = false;
+    if (box && landmarks) {
+      const nose = landmarks.getNose()[3] || landmarks.getNose()[0];
+      if (nose) {
+        const centerX = box.x + box.width / 2;
+        const centerY = box.y + box.height / 2;
+        const horizontalOffset = Math.abs(nose.x - centerX) / box.width;
+        const verticalOffset = Math.abs(nose.y - centerY) / box.height;
+        attentionAway = horizontalOffset > 0.2 || verticalOffset > 0.2;
+      }
+    }
+
     return {
       hasFace: true,
+      faceCount,
       dominantExpression,
       confidence,
+      attentionAway,
     };
   }
 

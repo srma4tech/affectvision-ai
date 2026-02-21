@@ -21,15 +21,19 @@ const reportPanel = document.getElementById("report-panel");
 const summaryList = document.getElementById("summary-list");
 const expressionList = document.getElementById("expression-list");
 const insightList = document.getElementById("insight-list");
+const riskList = document.getElementById("risk-list");
 const nextStepEl = document.getElementById("next-step");
 const restartSessionBtn = document.getElementById("restart-session");
+const riskLevelEl = document.getElementById("risk-level");
 
 let questionIndex = 0;
 const askedQuestionIndexes = new Set([0]);
 const metricSamples = [];
+const proctorEvents = [];
 const sessionStartTime = Date.now();
 let sessionEnded = false;
 let questionMode = "automated";
+let noFaceStreak = 0;
 
 const channel = new InterviewSyncChannel((message) => {
   if (!message || !message.type || sessionEnded) {
@@ -43,6 +47,14 @@ const channel = new InterviewSyncChannel((message) => {
 
   if (message.type === "interviewee:status") {
     runtimeStatus.textContent = message.statusText || "Live";
+    return;
+  }
+
+  if (message.type === "proctor:event") {
+    proctorEvents.push({
+      ...message,
+      timestamp: Date.now(),
+    });
   }
 });
 
@@ -111,14 +123,39 @@ function handleMetrics(metrics) {
   });
 
   if (!metrics.hasFace) {
+    noFaceStreak += 1;
     expressionEl.textContent = "No face detected";
     confidenceEl.textContent = "0%";
     runtimeStatus.textContent = "Waiting for face";
+    if (noFaceStreak === 8) {
+      proctorEvents.push({
+        type: "proctor:event",
+        eventType: "face_missing_long",
+        detail: "Face missing for a sustained interval.",
+        timestamp: Date.now(),
+      });
+    }
+    riskLevelEl.textContent = "Medium";
     return;
   }
 
+  noFaceStreak = 0;
   expressionEl.textContent = metrics.dominantExpression;
   confidenceEl.textContent = `${Math.round(metrics.confidence * 100)}%`;
+
+  const sampleRisk =
+    (metrics.faceCount > 1 ? 2 : 0) +
+    (metrics.attentionAway ? 1 : 0) +
+    (metrics.backgroundMotionScore > 0.35 ? 1 : 0);
+
+  if (sampleRisk >= 3) {
+    riskLevelEl.textContent = "High";
+  } else if (sampleRisk >= 1) {
+    riskLevelEl.textContent = "Medium";
+  } else {
+    riskLevelEl.textContent = "Low";
+  }
+
   runtimeStatus.textContent = "Live";
 }
 
@@ -144,6 +181,8 @@ function buildReport() {
     ]);
     setListItems(expressionList, ["No expression data available."]);
     setListItems(insightList, ["Unable to compute insights for this run."]);
+    setListItems(riskList, ["No risk signals captured because no interviewee samples were received."]);
+    riskLevelEl.textContent = "Unknown";
     nextStepEl.textContent = "Run a new interview and keep your face in frame for better analysis.";
     return;
   }
@@ -168,6 +207,12 @@ function buildReport() {
     : ["No expression data captured."];
 
   const insights = [];
+  const multiFaceSamples = metricSamples.filter((sample) => sample.faceCount > 1).length;
+  const attentionAwaySamples = metricSamples.filter((sample) => sample.attentionAway).length;
+  const highMotionSamples = metricSamples.filter((sample) => (sample.backgroundMotionScore || 0) > 0.35).length;
+  const tabHiddenEvents = proctorEvents.filter((event) => event.eventType === "tab_hidden").length;
+  const longMissingEvents = proctorEvents.filter((event) => event.eventType === "face_missing_long").length;
+
   if (facePresencePct < 80) {
     insights.push("Face visibility was inconsistent. Improve framing and lighting for stronger feedback.");
   }
@@ -191,6 +236,38 @@ function buildReport() {
     insights.push("Good baseline session. Increase question difficulty in the next run.");
   }
 
+  const riskRate = metricSamples.length
+    ? Math.round(
+        ((multiFaceSamples * 2 + attentionAwaySamples + highMotionSamples + tabHiddenEvents * 3) /
+          metricSamples.length) *
+          100,
+      )
+    : 0;
+
+  let riskBand = "Low";
+  if (riskRate >= 30 || tabHiddenEvents > 1 || multiFaceSamples > 3) {
+    riskBand = "High";
+  } else if (riskRate >= 12 || tabHiddenEvents > 0 || multiFaceSamples > 0) {
+    riskBand = "Medium";
+  }
+
+  const riskItems = [
+    `Overall risk band: ${riskBand}`,
+    `Additional face detected samples: ${multiFaceSamples}`,
+    `Attention-away samples: ${attentionAwaySamples}`,
+    `Background motion spikes: ${highMotionSamples}`,
+    `Tab switched/hidden events: ${tabHiddenEvents}`,
+    `Sustained face-missing events: ${longMissingEvents}`,
+  ];
+
+  const eventDetails = proctorEvents.slice(-5).map((event) => {
+    const timeLabel = new Date(event.timestamp).toLocaleTimeString();
+    return `${timeLabel}: ${event.detail || event.eventType}`;
+  });
+  if (eventDetails.length > 0) {
+    riskItems.push(`Recent events: ${eventDetails.join(" | ")}`);
+  }
+
   setListItems(summaryList, [
     `Duration: ${sessionDurationSec}s`,
     `Questions attempted: ${askedQuestionIndexes.size}/${QUESTIONS.length}`,
@@ -202,8 +279,12 @@ function buildReport() {
 
   setListItems(expressionList, expressionItems);
   setListItems(insightList, insights);
+  setListItems(riskList, riskItems);
+  riskLevelEl.textContent = riskBand;
 
-  if (avgConfidence < 60) {
+  if (riskBand === "High") {
+    nextStepEl.textContent = "Run a supervised re-interview and review flagged risk timestamps before decisioning.";
+  } else if (avgConfidence < 60) {
     nextStepEl.textContent = "Repeat the same question set once with slower pacing and concise 60-90 second answers.";
   } else if (facePresencePct < 80) {
     nextStepEl.textContent = "Run the next session with eye-line alignment and brighter front lighting for cleaner tracking.";
@@ -236,6 +317,7 @@ publishQuestion(QUESTIONS[questionIndex], "automated");
 nextQuestionBtn.disabled = false;
 sendManualQuestionBtn.disabled = true;
 runtimeStatus.textContent = "Waiting for interviewee";
+riskLevelEl.textContent = "Low";
 
 window.addEventListener("beforeunload", () => {
   channel.close();
