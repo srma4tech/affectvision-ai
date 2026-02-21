@@ -10,7 +10,11 @@
     <script defer src="script.js"></script>
 </head>
 <body>
-    <video id="video" width="720" height="560" autoplay muted src=""></video>
-
+    <main class="app">
+        <p id="status" role="status" aria-live="polite">Loading models...</p>
+        <div class="video-wrapper">
+            <video id="video" width="720" height="560" autoplay muted playsinline></video>
+        </div>
+    </main>
 </body>
 </html>
