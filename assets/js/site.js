@@ -1,1 +1,111 @@
-(()=>{const d=document,w=window;const t=d.getElementById("theme-toggle");const saved=localStorage.getItem("affectvision-theme");if(saved==="dark"){d.body.classList.add("dark");if(t)t.textContent="Light";}function toggleTheme(){const dark=d.body.classList.toggle("dark");if(t)t.textContent=dark?"Light":"Dark";localStorage.setItem("affectvision-theme",dark?"dark":"light");}t?.addEventListener("click",toggleTheme);const obs="IntersectionObserver"in w?new IntersectionObserver((entries)=>{entries.forEach((e)=>{if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target);}})},{threshold:.15}):null;d.querySelectorAll(".reveal").forEach((el)=>{if(obs){obs.observe(el);}else{el.classList.add("visible");}});const video=d.getElementById("webcam-preview");const start=d.getElementById("start-webcam");const stop=d.getElementById("stop-webcam");const ws=d.getElementById("webcam-status");const skV=d.getElementById("webcam-skeleton");const skC=d.getElementById("chart-skeleton");const shellV=d.getElementById("webcam-shell");const shellC=d.getElementById("chart-shell");let stream=null,chart=null,timer=null;function makeChart(){if(chart||typeof Chart==="undefined")return;const c=d.getElementById("confidence-chart");if(!c)return;chart=new Chart(c.getContext("2d"),{type:"line",data:{labels:[],datasets:[{data:[],borderColor:"#0b7a75",pointRadius:2,tension:.3,fill:false}]},options:{animation:false,responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});}function point(){if(!chart)return;const l=chart.data.datasets[0].data.at(-1)??74;const n=Math.max(42,Math.min(99,l+Math.round((Math.random()-.5)*12)));chart.data.labels.push(new Date().toLocaleTimeString([], {hour12:false,minute:"2-digit",second:"2-digit"}));chart.data.datasets[0].data.push(n);if(chart.data.labels.length>16){chart.data.labels.shift();chart.data.datasets[0].data.shift();}chart.update("none");}async function startDemo(){if(!navigator.mediaDevices?.getUserMedia){if(ws)ws.textContent="Webcam API unsupported in this browser.";return;}try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});if(video)video.srcObject=stream;skV?.classList.add("hidden");skC?.classList.add("hidden");shellV?.classList.remove("hidden");shellC?.classList.remove("hidden");if(ws)ws.textContent="Live demo active. Simulating real-time confidence trend.";makeChart();point();clearInterval(timer);timer=setInterval(point,1200);}catch{if(ws)ws.textContent="Camera access denied. Allow webcam permission to continue.";}}function stopDemo(){if(timer){clearInterval(timer);timer=null;}if(stream){stream.getTracks().forEach((tr)=>tr.stop());stream=null;}if(video)video.srcObject=null;if(ws)ws.textContent="Webcam demo stopped.";}start?.addEventListener("click",startDemo);stop?.addEventListener("click",stopDemo);w.addEventListener("beforeunload",stopDemo);})();
+﻿(()=>{
+  const d=document,w=window;
+  const t=d.getElementById("theme-toggle");
+  const saved=localStorage.getItem("affectvision-theme");
+
+  const basePath=w.location.pathname.includes("/affectvision-ai/")?"/affectvision-ai/":"/";
+
+  function registerPwa(){
+    const isSecure=w.location.protocol==="https:"||w.location.hostname==="localhost";
+    if(!isSecure||!("serviceWorker" in navigator)) return;
+    w.addEventListener("load",()=>{
+      navigator.serviceWorker.register(`${basePath}service-worker.js`,{scope:basePath}).catch(()=>{});
+    });
+  }
+
+  if(saved==="dark"){
+    d.body.classList.add("dark");
+    if(t)t.textContent="Light";
+  }
+
+  function toggleTheme(){
+    const dark=d.body.classList.toggle("dark");
+    if(t)t.textContent=dark?"Light":"Dark";
+    localStorage.setItem("affectvision-theme",dark?"dark":"light");
+  }
+  t?.addEventListener("click",toggleTheme);
+
+  const obs="IntersectionObserver" in w
+    ? new IntersectionObserver((entries)=>{
+        entries.forEach((e)=>{
+          if(e.isIntersecting){
+            e.target.classList.add("visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },{threshold:.15})
+    : null;
+
+  d.querySelectorAll(".reveal").forEach((el)=>{
+    if(obs){obs.observe(el);}else{el.classList.add("visible");}
+  });
+
+  const video=d.getElementById("webcam-preview");
+  const start=d.getElementById("start-webcam");
+  const stop=d.getElementById("stop-webcam");
+  const ws=d.getElementById("webcam-status");
+  const skV=d.getElementById("webcam-skeleton");
+  const skC=d.getElementById("chart-skeleton");
+  const shellV=d.getElementById("webcam-shell");
+  const shellC=d.getElementById("chart-shell");
+  let stream=null,chart=null,timer=null;
+
+  function makeChart(){
+    if(chart||typeof Chart==="undefined") return;
+    const c=d.getElementById("confidence-chart");
+    if(!c) return;
+    chart=new Chart(c.getContext("2d"),{
+      type:"line",
+      data:{labels:[],datasets:[{data:[],borderColor:"#0b7a75",pointRadius:2,tension:.3,fill:false}]},
+      options:{animation:false,responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}
+    });
+  }
+
+  function point(){
+    if(!chart) return;
+    const l=chart.data.datasets[0].data.at(-1)??74;
+    const n=Math.max(42,Math.min(99,l+Math.round((Math.random()-.5)*12)));
+    chart.data.labels.push(new Date().toLocaleTimeString([], {hour12:false,minute:"2-digit",second:"2-digit"}));
+    chart.data.datasets[0].data.push(n);
+    if(chart.data.labels.length>16){
+      chart.data.labels.shift();
+      chart.data.datasets[0].data.shift();
+    }
+    chart.update("none");
+  }
+
+  async function startDemo(){
+    if(!navigator.mediaDevices?.getUserMedia){
+      if(ws)ws.textContent="Webcam API unsupported in this browser.";
+      return;
+    }
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
+      if(video)video.srcObject=stream;
+      skV?.classList.add("hidden");
+      skC?.classList.add("hidden");
+      shellV?.classList.remove("hidden");
+      shellC?.classList.remove("hidden");
+      if(ws)ws.textContent="Live demo active. Simulating real-time confidence trend.";
+      makeChart();
+      point();
+      clearInterval(timer);
+      timer=setInterval(point,1200);
+    }catch{
+      if(ws)ws.textContent="Camera access denied. Allow webcam permission to continue.";
+    }
+  }
+
+  function stopDemo(){
+    if(timer){clearInterval(timer);timer=null;}
+    if(stream){stream.getTracks().forEach((tr)=>tr.stop());stream=null;}
+    if(video)video.srcObject=null;
+    if(ws)ws.textContent="Webcam demo stopped.";
+  }
+
+  start?.addEventListener("click",startDemo);
+  stop?.addEventListener("click",stopDemo);
+  w.addEventListener("beforeunload",stopDemo);
+
+  registerPwa();
+})();
