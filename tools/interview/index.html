@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interviewer Console | MoodLens</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="../../face-api.min.js"></script>
+    <script type="module" defer src="./script.js"></script>
+</head>
+<body>
+    <main class="app">
+        <header class="topbar">
+            <a class="back" href="../../index.html">Back to tools</a>
+            <h1>Interviewer Console</h1>
+        </header>
+
+        <section class="layout">
+            <section class="panel interview-stage">
+                <h2>Interviewer View</h2>
+                <p id="status" class="status" role="status" aria-live="polite">
+                    Analysis is disabled on interviewer screen. Insights are collected from interviewee only.
+                </p>
+                <p class="note">
+                    Keep this console open to control questions and receive interviewee analytics in real time.
+                </p>
+            </section>
+
+            <aside class="panel insights">
+                <h2>Session Control</h2>
+                <dl>
+                    <div>
+                        <dt>Organization</dt>
+                        <dd id="org-name">Acme Hiring Team</dd>
+                    </div>
+                    <div>
+                        <dt>Scheduled interview</dt>
+                        <dd id="slot">Today 10:30 AM - SDE Round 1</dd>
+                    </div>
+                    <div>
+                        <dt>Current question</dt>
+                        <dd id="question">Tell me about yourself and what role you are targeting.</dd>
+                    </div>
+                    <div>
+                        <dt>Dominant expression</dt>
+                        <dd id="expression">-</dd>
+                    </div>
+                    <div>
+                        <dt>Confidence score</dt>
+                        <dd id="confidence">-</dd>
+                    </div>
+                    <div>
+                        <dt>Status</dt>
+                        <dd id="runtime-status">Idle</dd>
+                    </div>
+                </dl>
+                <fieldset class="mode">
+                    <legend>Question mode</legend>
+                    <label>
+                        <input type="radio" name="question-mode" value="automated" checked>
+                        Automated
+                    </label>
+                    <label>
+                        <input type="radio" name="question-mode" value="manual">
+                        Ask myself
+                    </label>
+                </fieldset>
+                <div class="manual-controls">
+                    <label for="manual-question">Manual question</label>
+                    <textarea id="manual-question" rows="3" placeholder="Type a custom question..."></textarea>
+                    <button id="send-manual-question" type="button" class="secondary">Send Question</button>
+                </div>
+                <div class="actions">
+                    <button id="next-question" type="button">Ask Automated Question</button>
+                    <button id="end-interview" type="button" class="secondary">End Interview</button>
+                </div>
+                <a class="open-screen" href="./interviewee.html" target="_blank" rel="noopener">Open Interviewee Screen</a>
+            </aside>
+        </section>
+
+        <section class="panel report hidden" id="report-panel" aria-live="polite">
+            <h2>Interview Report</h2>
+            <div class="report-grid">
+                <article>
+                    <h3>Session Summary</h3>
+                    <ul id="summary-list"></ul>
+                </article>
+                <article>
+                    <h3>Expression Distribution</h3>
+                    <ul id="expression-list"></ul>
+                </article>
+                <article>
+                    <h3>Insights</h3>
+                    <ul id="insight-list"></ul>
+                </article>
+                <article>
+                    <h3>Recommended Next Step</h3>
+                    <p id="next-step"></p>
+                </article>
+            </div>
+            <button id="restart-session" type="button">Start New Session</button>
+        </section>
+    </main>
+</body>
+</html>
